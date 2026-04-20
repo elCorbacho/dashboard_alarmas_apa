@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/bi4h_dashboard.html"
+    }
+  ]
+}
