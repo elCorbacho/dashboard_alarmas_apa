@@ -99,13 +99,14 @@ export function OverviewClient({
   };
 
   return (
-    <section className="space-y-4">
-      <p className="text-sm uppercase tracking-[0.2em] text-primary">Overview</p>
-      <h2 className="text-xl font-semibold">Monitoreo operativo BI4H</h2>
-      <p className="max-w-2xl text-sm text-muted-foreground">
-        Paridad funcional basada en adapter mock: KPIs, filtros, widgets,
-        drilldown y tabla de casos listos para evolución hacia una API real.
-      </p>
+    <section className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-semibold">Monitoreo operativo BI4H</h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Paridad funcional basada en adapter mock: KPIs, filtros, widgets,
+          drilldown y tabla de casos listos para evolución hacia una API real.
+        </p>
+      </div>
 
       <KpiBar kpis={kpis} />
 

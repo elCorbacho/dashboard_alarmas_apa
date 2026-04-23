@@ -22,18 +22,18 @@ export function KpiBar({ kpis }: KpiBarProps) {
           className={`rounded-md border bg-card p-4 ${toneClassMap[kpi.tone]}`}
           aria-label={kpi.label}
         >
-          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="text-sm font-medium text-muted-foreground">
             {kpi.label}
           </p>
-          <p className="mt-2 text-2xl font-bold tabular-nums leading-tight">
+          <p className="mt-1 text-2xl font-bold tabular-nums">
             {kpi.value.toLocaleString('es-CL')}
             {kpi.unit ? (
-              <span className="ml-1 text-xs font-medium text-muted-foreground">
+              <span className="ml-1 text-sm font-normal text-muted-foreground">
                 {kpi.unit}
               </span>
             ) : null}
           </p>
-          <p className="mt-2 text-xs text-muted-foreground">{kpi.subtext}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{kpi.subtext}</p>
         </article>
       ))}
     </section>

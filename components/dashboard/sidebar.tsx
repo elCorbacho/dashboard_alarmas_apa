@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 
 import type { NavigationItem } from '@/lib/dashboard/contracts';
 import { cn } from '@/lib/utils';
+import { navigation } from '@/lib/ui/tokens';
 
 interface SidebarProps {
   id: string;
@@ -36,9 +37,7 @@ export function Sidebar({ id, navigation, mobileOpen, onClose }: SidebarProps) {
         aria-label="Navegación principal"
       >
         <div className="mb-6 space-y-1">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            BI4H
-          </p>
+          <p className="text-xs text-muted-foreground">BI4H</p>
           <h2 className="text-lg font-bold">Dashboard APA</h2>
         </div>
 
@@ -53,19 +52,14 @@ export function Sidebar({ id, navigation, mobileOpen, onClose }: SidebarProps) {
                     href={item.href}
                     onClick={onClose}
                     className={cn(
-                      'block rounded-md border px-3 py-2 text-sm font-medium leading-tight transition-colors focus-visible:border-primary focus-visible:outline-none',
+                      navigation.item,
                       active
-                        ? 'border-primary/30 bg-primary/10 text-foreground'
-                        : 'border-transparent text-muted-foreground hover:border-border hover:bg-accent hover:text-foreground',
+                        ? navigation.itemActive
+                        : navigation.itemInactive,
                     )}
                     aria-current={active ? 'page' : undefined}
                   >
                     <span>{item.label}</span>
-                    {!item.implemented ? (
-                      <span className="ml-2 text-xs uppercase tracking-[0.12em] text-muted-foreground/80">
-                        placeholder
-                      </span>
-                    ) : null}
                   </Link>
                 </li>
               );
