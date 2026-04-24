@@ -74,12 +74,12 @@ describe('dashboard selectors', () => {
 
     expect(viewModel).toBeDefined();
     expect(viewModel?.variant).toBe('blocks');
-    expect(viewModel?.rows.every((row) => row.pathologist === 'Dr. Rivas')).toBe(
-      true,
-    );
-    expect(viewModel?.rows.every((row) => row.location.includes('Estantería'))).toBe(
-      true,
-    );
+    expect(
+      viewModel?.rows.every((row) => row.pathologist === 'Dr. Rivas'),
+    ).toBe(true);
+    expect(
+      viewModel?.rows.every((row) => row.location.includes('Estantería')),
+    ).toBe(true);
   });
 
   it('resolves modal view model by ui state variant', () => {
@@ -104,7 +104,9 @@ describe('dashboard selectors', () => {
     }
 
     expect(
-      cases.rows.every((row) => 'technique' in row && row.technique === 'CORTE'),
+      cases.rows.every(
+        (row) => 'technique' in row && row.technique === 'CORTE',
+      ),
     ).toBe(true);
   });
 });

@@ -1,20 +1,46 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { spacing, padding, radius, typography, card, button, input } from './tokens';
+import { spacing, typography, card, navigation } from './tokens';
+
+// Re-export shadcn components
+export {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet';
+export {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+} from '@/components/ui/select';
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from '@/components/ui/table';
+export { Separator } from '@/components/ui/separator';
 
 interface CardProps {
   children: React.ReactNode;
   className?: string;
-  variant?: 'default' | 'section';
+  variant?: 'base' | 'section';
 }
 
-export function Card({ children, className, variant = 'default' }: CardProps) {
-  return (
-    <div className={cn(card[variant], className)}>
-      {children}
-    </div>
-  );
+export function Card({ children, className, variant = 'base' }: CardProps) {
+  return <div className={cn(card[variant], className)}>{children}</div>;
 }
 
 interface SectionProps {
@@ -23,11 +49,13 @@ interface SectionProps {
   spacing?: keyof typeof spacing;
 }
 
-export function Section({ children, className, spacing: space = 'lg' }: SectionProps) {
+export function Section({
+  children,
+  className,
+  spacing: space = 'lg',
+}: SectionProps) {
   return (
-    <section className={cn(spacing[space], className)}>
-      {children}
-    </section>
+    <section className={cn(spacing[space], className)}>{children}</section>
   );
 }
 
@@ -65,13 +93,21 @@ interface BadgeProps {
   className?: string;
 }
 
-export function Badge({ children, variant = 'default', className }: BadgeProps) {
+export function Badge({
+  children,
+  variant = 'default',
+  className,
+}: BadgeProps) {
   return (
-    <span className={cn(
-      'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium',
-      variant === 'default' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground',
-      className
-    )}>
+    <span
+      className={cn(
+        'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium',
+        variant === 'default'
+          ? 'bg-primary/10 text-primary'
+          : 'bg-muted text-muted-foreground',
+        className,
+      )}
+    >
       {children}
     </span>
   );
@@ -87,7 +123,13 @@ interface NavLinkProps {
 
 import Link from 'next/link';
 
-export function NavLink({ href, children, active, onClick, className }: NavLinkProps) {
+export function NavLink({
+  href,
+  children,
+  active,
+  onClick,
+  className,
+}: NavLinkProps) {
   return (
     <Link
       href={href}
@@ -95,7 +137,7 @@ export function NavLink({ href, children, active, onClick, className }: NavLinkP
       className={cn(
         navigation.item,
         active ? navigation.itemActive : navigation.itemInactive,
-        className
+        className,
       )}
     >
       {children}
@@ -109,9 +151,5 @@ interface NavListProps {
 }
 
 export function NavList({ children, className }: NavListProps) {
-  return (
-    <nav className={cn('grid gap-2', className)}>
-      {children}
-    </nav>
-  );
+  return <nav className={cn('grid gap-2', className)}>{children}</nav>;
 }

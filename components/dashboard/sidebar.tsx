@@ -4,8 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import type { NavigationItem } from '@/lib/dashboard/contracts';
+import { Sheet, SheetContent } from '@/lib/ui/components';
 import { cn } from '@/lib/utils';
-import { navigation } from '@/lib/ui/tokens';
+import { navigation as navTokens } from '@/lib/ui/tokens';
+
+const NAV_ARIA_LABEL = 'Navegación principal';
 
 interface SidebarProps {
   id: string;
@@ -17,55 +20,60 @@ interface SidebarProps {
 export function Sidebar({ id, navigation, mobileOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
 
+  const sidebarContent = (
+    <>
+      <div className="mb-6 space-y-1">
+        <p className="text-xs text-muted-foreground">BI4H</p>
+        <h2 className="text-lg font-bold">Dashboard APA</h2>
+      </div>
+
+      <nav>
+        <ul className="grid gap-2">
+          {navigation.map((item) => {
+            const active = pathname === item.href;
+
+            return (
+              <li key={item.id}>
+                <Link
+                  href={item.href}
+                  onClick={onClose}
+                  className={cn(
+                    navTokens.item,
+                    active ? navTokens.itemActive : navTokens.itemInactive,
+                  )}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  <span>{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </>
+  );
+
   return (
     <>
-      <div
-        className={cn(
-          'fixed inset-0 z-40 bg-black/40 transition-opacity md:hidden',
-          mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
-        )}
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      {/* Mobile: Sheet component with built-in overlay */}
+      <Sheet open={mobileOpen} onOpenChange={(open) => !open && onClose()}>
+        <SheetContent
+          id={id}
+          side="left"
+          className="w-[18rem] border-r bg-background p-4 md:hidden"
+          aria-label={NAV_ARIA_LABEL}
+        >
+          {sidebarContent}
+        </SheetContent>
+      </Sheet>
 
+      {/* Desktop: static sidebar */}
       <aside
         id={id}
-        className={cn(
-          'fixed inset-y-0 left-0 z-50 w-[18rem] border-r border-border bg-background p-4 transition-transform md:static md:z-auto md:w-72 md:translate-x-0',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full',
-        )}
-        aria-label="Navegación principal"
+        className="hidden bg-background p-4 md:block md:w-72"
+        aria-label={NAV_ARIA_LABEL}
       >
-        <div className="mb-6 space-y-1">
-          <p className="text-xs text-muted-foreground">BI4H</p>
-          <h2 className="text-lg font-bold">Dashboard APA</h2>
-        </div>
-
-        <nav>
-          <ul className="grid gap-2">
-            {navigation.map((item) => {
-              const active = pathname === item.href;
-
-              return (
-                <li key={item.id}>
-                  <Link
-                    href={item.href}
-                    onClick={onClose}
-                    className={cn(
-                      navigation.item,
-                      active
-                        ? navigation.itemActive
-                        : navigation.itemInactive,
-                    )}
-                    aria-current={active ? 'page' : undefined}
-                  >
-                    <span>{item.label}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+        {sidebarContent}
       </aside>
     </>
   );

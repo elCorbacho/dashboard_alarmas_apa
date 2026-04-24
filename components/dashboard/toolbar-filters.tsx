@@ -25,70 +25,70 @@ export function ToolbarFilters({
     >
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div className="grid gap-3 md:grid-cols-3 xl:flex xl:flex-wrap xl:items-end xl:gap-4">
-        <FilterControl label="Área" htmlFor="filterArea">
-          <select
-            id="filterArea"
-            value={value.area}
-            onChange={(event) =>
-              onChange({
-                ...value,
-                area: event.target.value as OverviewFiltersState['area'],
-              })
-            }
-            className="h-10 w-full min-w-[13rem] rounded-md border border-border bg-background px-3 text-sm focus-visible:border-primary focus-visible:outline-none"
-          >
-            {filters.areas.map((option) => (
-              <option
-                key={option.value}
-                value={option.value}
-                disabled={option.supported === false}
-              >
-                {option.label}
-                {option.supported === false ? ' (placeholder)' : ''}
-              </option>
-            ))}
-          </select>
-        </FilterControl>
+          <FilterControl label="Área" htmlFor="filterArea">
+            <select
+              id="filterArea"
+              value={value.area}
+              onChange={(event) =>
+                onChange({
+                  ...value,
+                  area: event.target.value as OverviewFiltersState['area'],
+                })
+              }
+              className="h-10 w-full min-w-[13rem] rounded-md border border-border bg-background px-3 text-sm focus-visible:border-primary focus-visible:outline-none"
+            >
+              {filters.areas.map((option) => (
+                <option
+                  key={option.value}
+                  value={option.value}
+                  disabled={option.supported === false}
+                >
+                  {option.label}
+                  {option.supported === false ? ' (placeholder)' : ''}
+                </option>
+              ))}
+            </select>
+          </FilterControl>
 
-        <FilterControl label="Umbral" htmlFor="filterThreshold">
-          <select
-            id="filterThreshold"
-            value={value.threshold}
-            onChange={(event) =>
-              onChange({
-                ...value,
-                threshold: Number(event.target.value),
-              })
-            }
-            className="h-10 w-full min-w-[10rem] rounded-md border border-border bg-background px-3 text-sm focus-visible:border-primary focus-visible:outline-none"
-          >
-            {filters.thresholds.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </FilterControl>
+          <FilterControl label="Umbral" htmlFor="filterThreshold">
+            <select
+              id="filterThreshold"
+              value={value.threshold}
+              onChange={(event) =>
+                onChange({
+                  ...value,
+                  threshold: Number(event.target.value),
+                })
+              }
+              className="h-10 w-full min-w-[10rem] rounded-md border border-border bg-background px-3 text-sm focus-visible:border-primary focus-visible:outline-none"
+            >
+              {filters.thresholds.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </FilterControl>
 
-        <FilterControl label="Patólogo" htmlFor="filterPathologist">
-          <select
-            id="filterPathologist"
-            value={value.pathologist}
-            onChange={(event) =>
-              onChange({
-                ...value,
-                pathologist: event.target.value,
-              })
-            }
-            className="h-10 w-full min-w-[12rem] rounded-md border border-border bg-background px-3 text-sm focus-visible:border-primary focus-visible:outline-none"
-          >
-            {filters.pathologists.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </FilterControl>
+          <FilterControl label="Patólogo" htmlFor="filterPathologist">
+            <select
+              id="filterPathologist"
+              value={value.pathologist}
+              onChange={(event) =>
+                onChange({
+                  ...value,
+                  pathologist: event.target.value,
+                })
+              }
+              className="h-10 w-full min-w-[12rem] rounded-md border border-border bg-background px-3 text-sm focus-visible:border-primary focus-visible:outline-none"
+            >
+              {filters.pathologists.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </FilterControl>
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row xl:shrink-0 xl:justify-end">
@@ -112,7 +112,8 @@ export function ToolbarFilters({
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Opciones marcadas como placeholder se muestran solo como referencia de roadmap.
+        Opciones marcadas como placeholder se muestran solo como referencia de
+        roadmap.
       </p>
     </section>
   );

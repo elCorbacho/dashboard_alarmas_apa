@@ -131,7 +131,10 @@ export function OverviewClient({
           }));
         }}
         onSelectTechnique={(technique) => {
-          if (!uiState.drilldown || !isDrilldownWidgetId(uiState.drilldown.widgetId)) {
+          if (
+            !uiState.drilldown ||
+            !isDrilldownWidgetId(uiState.drilldown.widgetId)
+          ) {
             return;
           }
 

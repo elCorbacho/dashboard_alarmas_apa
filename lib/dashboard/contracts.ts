@@ -286,7 +286,9 @@ export interface ModalVariantCatalog {
   blocks: Partial<Record<WidgetId, ModalVariantDataset<BlockTableRow>>>;
   medical: Partial<Record<WidgetId, ModalVariantDataset<MedicalTableRow>>>;
   cases: Partial<Record<WidgetId, ModalVariantDataset<CaseTableRow>>>;
-  'tech-summary': Partial<Record<WidgetId, ModalVariantDataset<TechSummaryRow>>>;
+  'tech-summary': Partial<
+    Record<WidgetId, ModalVariantDataset<TechSummaryRow>>
+  >;
 }
 
 /**

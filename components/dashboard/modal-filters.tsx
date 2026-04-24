@@ -1,6 +1,16 @@
 'use client';
 
-import type { ModalFilterOptions, ModalFilterState } from '@/lib/dashboard/contracts';
+import type {
+  ModalFilterOptions,
+  ModalFilterState,
+} from '@/lib/dashboard/contracts';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/lib/ui/components';
 
 interface ModalFiltersProps {
   filters: ModalFilterState;
@@ -8,7 +18,11 @@ interface ModalFiltersProps {
   onChange: (next: ModalFilterState) => void;
 }
 
-export function ModalFilters({ filters, options, onChange }: ModalFiltersProps) {
+export function ModalFilters({
+  filters,
+  options,
+  onChange,
+}: ModalFiltersProps) {
   return (
     <section
       className="mb-3 grid gap-2 rounded-md border border-border bg-card/40 p-3 lg:grid-cols-5"
@@ -51,7 +65,9 @@ export function ModalFilters({ filters, options, onChange }: ModalFiltersProps) 
         <input
           type="search"
           value={filters.search}
-          onChange={(event) => onChange({ ...filters, search: event.target.value })}
+          onChange={(event) =>
+            onChange({ ...filters, search: event.target.value })
+          }
           className="h-9 rounded-md border border-border bg-background px-3 text-sm tracking-normal text-foreground focus-visible:border-primary focus-visible:outline-none"
           placeholder="Caso, técnica, paciente..."
         />
@@ -79,18 +95,18 @@ function FilterSelect({
       className="grid gap-1 text-xs uppercase tracking-[0.12em] text-muted-foreground"
     >
       {label}
-      <select
-        id={id}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="h-9 rounded-md border border-border bg-background px-3 text-sm tracking-normal text-foreground focus-visible:border-primary focus-visible:outline-none"
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger id={id} className="h-9">
+          <SelectValue placeholder="Seleccionar..." />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </label>
   );
 }

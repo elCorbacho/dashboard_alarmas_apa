@@ -1,0 +1,320 @@
+# Technical Design: fix3-transitions
+
+## Overview
+
+Add smooth, professional animations (~200-350ms) to the dashboard using framer-motion and CSS transitions. The goal is improved perceived quality without sacrificing performance.
+
+---
+
+## 1. File Structure Changes
+
+### 1.1 `app/globals.css`
+
+**Add CSS theme transition on universal selector (raw CSS, NOT @apply):**
+
+```css
+/* Theme transition - applied to all elements including pseudo-elements */
+*, *::before, *::after {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+/* Exclude focus rings - they need instant feedback */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Exclude elements that need instant transitions */
+.no-transition,
+.no-transition * {
+  transition: none !important;
+}
+```
+
+**Rationale**: Using raw CSS instead of `@apply` to avoid Tailwind purging issues. The `prefers-reduced-motion` media query already exists (lines 67-76) and will override these transitions.
+
+### 1.2 `components/dashboard/kpi-bar.tsx`
+
+**Add motion.div wrappers + count-up animation:**
+
+```tsx
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { useEffect, useReducedMotion } from 'react';
+```
+
+- Wrap each `Card` in `motion.div` with entrance animation
+- Implement count-up for numeric KPI values using `useMotionValue` + `animate()`
+- Stagger delay: `index * 0.05s`
+- Duration: `0.2s` with `easeOut`
+
+**Count-up implementation pattern:**
+```tsx
+const motionValue = useMotionValue(0);
+const displayValue = useTransform(motionValue, (v) => 
+  Math.round(v).toLocaleString('es-CL')
+);
+
+useEffect(() => {
+  const controls = animate(motionValue, kpi.value, {
+    duration: 0.6,
+    ease: 'easeOut',
+  });
+  return controls.stop;
+}, [motionValue, kpi.value]);
+```
+
+### 1.3 `components/dashboard/widgets-section.tsx`
+
+**Add motion.div wrappers + enhanced hover/click:**
+
+```tsx
+import { motion } from 'framer-motion';
+```
+
+- Wrap widget buttons with `motion.button` for enhanced hover/click
+- Hover: `scale: 1.02`, `shadow-md`, `border-primary/50`
+- Click: `scale: 0.98`
+- Duration: `0.2s`
+- Section entrance: stagger with `index * 0.05s` delay
+
+**Note**: Use `whileHover` and `whileTap` directly on the motion.button, NOT Tailwind classes for scale/shadow.
+
+### 1.4 `components/dashboard/cases-modal.tsx`
+
+**Add AnimatePresence + motion.div wrapper for INNER content only:**
+
+```tsx
+import { AnimatePresence, motion } from 'framer-motion';
+import { useReducedMotion } from 'react';
+```
+
+- Wrap INNER content of `DialogContent` (after DialogTitle/DialogDescription) in `motion.div`
+- **CRITICAL**: Do NOT wrap `DialogContent` itself — Radix has its own CSS animations
+- Animation: `opacity: 0→1`, `scale: 0.95→1`, duration `0.25s`, `easeOut`
+- Exit animation: reverse
+- Wrap `Dialog` in `AnimatePresence`
+
+### 1.5 `components/dashboard/modal-table.tsx`
+
+**Add motion.tr with stagger + CSS class for hover:**
+
+```tsx
+import { motion } from 'framer-motion';
+import { useReducedMotion } from 'react';
+```
+
+- Replace `TableRow` with `motion.tr` for row animations
+- Stagger: `delay: rowIndex * 0.03s`
+- Duration: `0.15s`
+- Hover: CSS class `.table-row-hover` with **hardcoded HSL** (NOT framer-motion whileHover with CSS var)
+
+**Add to `app/globals.css`:**
+```css
+.table-row-hover {
+  transition: background-color 0.15s ease;
+}
+
+.light .table-row-hover:hover {
+  background-color: hsl(0, 17%, 97%);
+}
+
+.dark .table-row-hover:hover {
+  background-color: hsl(0, 5%, 18%);
+}
+```
+
+**Rationale**: CSS var runtime resolution doesn't work reliably with framer-motion's whileHover. Hardcoded HSL ensures consistent behavior.
+
+---
+
+## 2. Architecture Decisions
+
+### 2.1 Theme Transition Strategy
+- **Decision**: Raw CSS transition on universal selector
+- **Why**: Tailwind `@apply` can be purged; raw CSS is reliable
+- **Motion safety**: Existing `prefers-reduced-motion` media query disables all transitions
+
+### 2.2 KPI Count-up Implementation
+- **Decision**: `useMotionValue` + `useTransform` + `animate()` from framer-motion
+- **Why**: Smooth interpolation, respects `useReducedMotion()`, no layout triggers
+- **Format**: `toLocaleString('es-CL')` for Chilean Spanish number formatting
+
+### 2.3 Cases Modal Animation
+- **Decision**: Wrap only the INNER content (children), NOT `DialogContent`
+- **Why**: Radix Dialog has built-in CSS animations that conflict with framer-motion on the root element
+- **Pattern**: `AnimatePresence` → `Dialog` → `DialogContent` → `motion.div(children)`
+
+### 2.4 Table Hover Implementation
+- **Decision**: CSS class `.table-row-hover` with hardcoded HSL values
+- **Why**: `whileHover={{ backgroundColor: 'hsl(var(--accent))' }}` doesn't resolve CSS vars at runtime
+- **HSL values**: Light mode `hsl(0, 17%, 97%)`, Dark mode `hsl(0, 5%, 18%)`
+
+---
+
+## 3. Animation Specifications
+
+| Animation | Duration | Easing | Properties | Stagger |
+|-----------|----------|--------|------------|---------|
+| Theme transition | 0.25s | ease | background-color, border-color, color | — |
+| KPI entrance | 0.2s | easeOut | opacity 0→1, y 10→0 | index × 0.05s |
+| KPI count-up | 0.6s | easeOut | numeric value 0→final | — |
+| Widget hover | 0.2s | ease | scale 1→1.02, shadow | — |
+| Widget click | 0.2s | ease | scale 0.98 | — |
+| Widget entrance | 0.2s | easeOut | opacity 0→1 | index × 0.05s |
+| Modal content | 0.25s | easeOut | opacity 0→1, scale 0.95→1 | — |
+| Table rows | 0.15s | ease | opacity 0→1 | rowIndex × 0.03s |
+
+---
+
+## 4. Testing Approach
+
+### 4.1 Test Files to Create
+- `components/dashboard/kpi-bar.test.tsx`
+- `components/dashboard/widgets-section.test.tsx`
+- `components/dashboard/cases-modal.test.tsx`
+- `components/dashboard/modal-table.test.tsx`
+
+### 4.2 Test Scenarios
+
+**Scenario A: Component renders without crash**
+```tsx
+it('renders without crashing', () => {
+  render(<KpiBar kpis={mockKpis} />);
+  expect(screen.getByRole('region', { name: /indicadores clave/i })).toBeInTheDocument();
+});
+```
+
+**Scenario B: With prefers-reduced-motion — instant render**
+```tsx
+it('renders instantly when prefers-reduced-motion is set', () => {
+  window.matchMedia = jest.fn().mockImplementation((query) => ({
+    matches: query === '(prefers-reduced-motion: reduce)',
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+  }));
+  
+  render(<KpiBar kpis={mockKpis} />);
+  const cards = screen.getAllByRole('region');
+  expect(cards.length).toBeGreaterThan(0);
+});
+```
+
+**Scenario C: Animation completes without error**
+```tsx
+it('animation completes without error', async () => {
+  render(<KpiBar kpis={mockKpis} />);
+  
+  // Advance animation frame
+  await act(async () => {
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  });
+  
+  expect(screen.getByText('1,500')).toBeInTheDocument();
+});
+```
+
+### 4.3 Test Utilities
+- Use `@testing-library/react` for component tests
+- Use `vitest` as test runner (already configured)
+- Mock `requestAnimationFrame` for animation timing if needed
+
+---
+
+## 5. Key Code Patterns
+
+### 5.1 KPI Count-up Pattern
+```tsx
+function AnimatedNumber({ value }: { value: number }) {
+  const motionValue = useMotionValue(0);
+  const displayValue = useTransform(motionValue, (v) => 
+    Math.round(v).toLocaleString('es-CL')
+  );
+  
+  useEffect(() => {
+    const controls = animate(motionValue, value, {
+      duration: 0.6,
+      ease: 'easeOut',
+    });
+    return controls.stop;
+  }, [motionValue, value]);
+  
+  return <motion.span>{displayValue}</motion.span>;
+}
+```
+
+### 5.2 Stagger Pattern
+```tsx
+<motion.div
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: index * 0.05, duration: 0.2, ease: 'easeOut' }}
+>
+```
+
+### 5.3 Reduced Motion Hook
+```tsx
+function useAnimationConfig() {
+  const shouldReduceMotion = useReducedMotion();
+  
+  return shouldReduceMotion
+    ? { transition: { duration: 0 } }
+    : { transition: { duration: 0.2, ease: 'easeOut' } };
+}
+```
+
+---
+
+## 6. Implementation Order
+
+1. **`app/globals.css`** — Theme transitions (CSS only, lowest risk)
+2. **`kpi-bar.tsx`** — KPI entrance + count-up
+3. **`widgets-section.tsx`** — Micro-interactions + entrance
+4. **`cases-modal.tsx`** — AnimatePresence + modal content animation
+5. **`modal-table.tsx`** — Row stagger + hover CSS class
+
+---
+
+## 7. Risks & Mitigations
+
+| Risk | Likelihood | Mitigation |
+|------|------------|------------|
+| Tailwind `@apply` purging | High | Use raw CSS instead of `@apply` for transitions |
+| Radix + framer-motion conflict | Medium | Wrap children only, not DialogContent |
+| CSS var runtime resolution in whileHover | High | Use hardcoded HSL values for table hover |
+| Animation performance jank | Low | Use only `transform`/`opacity`; avoid layout triggers |
+| prefers-reduced-motion not respected | Medium | Explicit check via `useReducedMotion()` hook |
+
+---
+
+## 8. Rollback Plan
+
+1. Remove CSS transition from `app/globals.css`
+2. Remove `motion.div` wrappers from KPI bar, widgets, modal
+3. Remove `AnimatePresence` from cases-modal
+4. Replace `motion.tr` with plain `TableRow` in modal-table
+5. Remove `.table-row-hover` CSS class from globals.css
+
+---
+
+## 9. Dependencies
+
+- `framer-motion@^12.38.0` — already installed
+- `vitest` — already configured
+- `@testing-library/react` — already configured
+
+No new dependencies required.
+
+---
+
+## 10. Success Criteria
+
+- [ ] Theme transitions smoothly (~250ms) on dark/light switch
+- [ ] KPIs animate in with stagger on page load
+- [ ] KPI numbers count up from 0 to final value
+- [ ] Widgets show scale+shadow on hover, scale-down on click
+- [ ] Modal opens/closes with smooth scale+opacity
+- [ ] Table rows stagger in, highlight on hover
+- [ ] All animations respect `prefers-reduced-motion`
+- [ ] `npm run lint && npm run typecheck && npm run test` passes
+- [ ] Tests cover entrance, hover, exit animations for each component

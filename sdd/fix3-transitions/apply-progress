@@ -1,0 +1,67 @@
+# fix3-transitions Apply Progress
+
+## Status: COMPLETE ✅
+
+## Phases Implemented
+
+### Phase 1: app/globals.css ✅
+- Added raw CSS theme transitions on universal selector
+- Duration: 0.25s ease for background-color, border-color, color
+- Excluded focus rings with *:focus:not(:focus-visible)
+- Added .no-transition utility class
+- Added .table-row-hover class with hardcoded HSL values
+
+### Phase 2: components/dashboard/kpi-bar.tsx ✅
+- Imported motion, useMotionValue, animate from framer-motion
+- Wrapped each Card in motion.div with stagger entrance (index * 0.05s delay)
+- Added AnimatedNumber component with count-up animation using useMotionValue + on('change')
+- Duration: 0.2s easeOut for entrance, 0.6s for count-up
+- Created test: kpi-bar.test.tsx (6 tests)
+
+### Phase 3: components/dashboard/widgets-section.tsx ✅
+- Imported motion from framer-motion
+- Wrapped article in motion.div with stagger entrance (rowIndex * 0.05s delay)
+- Wrapped button in motion.button with whileHover (scale 1.02, shadow, border-primary/50) and whileTap (scale 0.98)
+- Duration: 0.2s for all animations
+- Created test: widgets-section.test.tsx (5 tests)
+
+### Phase 4: components/dashboard/cases-modal.tsx ✅
+- Imported AnimatePresence, motion from framer-motion
+- Wrapped Dialog in AnimatePresence
+- Wrapped inner content (buttons + div.p-4) in motion.div
+- Animation: initial={{ opacity: 0, scale: 0.95 }} → animate={{ opacity: 1, scale: 1 }}
+- Duration: 0.25s, easeOut
+- Created test: cases-modal.test.tsx (5 tests)
+
+### Phase 5: components/dashboard/modal-table.tsx ✅
+- Imported motion from framer-motion
+- Replaced TableRow with motion.tr for each row
+- Added stagger: delay = rowIndex * 0.03s
+- Duration: 0.15s
+- Added className="table-row-hover" to motion.tr
+- Created test: modal-table.test.tsx (4 tests)
+
+## Quality Gates
+- ✅ npm run lint - 0 errors
+- ✅ npm run typecheck - passes
+- ✅ npm run test - 38 tests passing
+
+## Artifacts Created
+- components/dashboard/kpi-bar.test.tsx
+- components/dashboard/widgets-section.test.tsx
+- components/dashboard/cases-modal.test.tsx
+- components/dashboard/modal-table.test.tsx
+
+## Next Recommended
+1. Run full verification with `npm run build` to ensure static export works
+2. Manual testing of theme transitions in browser
+3. Archive change with sdd-archive skill
+
+## Risks
+- None identified - all quality gates pass
+
+## Implementation Notes
+- Used useMotionValue + on('change') pattern instead of useTransform for count-up (works better in jsdom tests)
+- motion.tr replaces TableRow (shadcn component) - requires motion import
+- AnimatePresence wraps Dialog, motion.div wraps inner content (NOT DialogContent itself)
+- .table-row-hover uses hardcoded HSL values (light: hsl(0, 17%, 97%), dark: hsl(0, 5%, 18%))

@@ -83,7 +83,7 @@ export const kpiData: KpiMetric[] = [
 
 export const toolbarData: ToolbarFilters = {
   areas: [
-    { value: '', label: 'Todas las áreas', supported: true },
+    { value: '__all__', label: 'Todas las áreas', supported: true },
     { value: 'macro', label: 'Macroscopía', supported: true },
     { value: 'inclusion', label: 'Inclusión/Corte', supported: true },
     { value: 'hq', label: 'Histoquímicas', supported: false },
@@ -99,7 +99,7 @@ export const toolbarData: ToolbarFilters = {
     { value: 14, label: '> 14 días' },
   ],
   pathologists: [
-    { value: '', label: 'Todos' },
+    { value: '__all__', label: 'Todos' },
     { value: 'Dr. Rivas', label: 'Dr. Rivas' },
     { value: 'Dra. Pérez', label: 'Dra. Pérez' },
     { value: 'Dr. Muñoz', label: 'Dr. Muñoz' },
@@ -201,9 +201,7 @@ const rowBlueprints = [
   },
 ] as const;
 
-function getRowPlaceholderCount(
-  row: (typeof rowBlueprints)[number],
-): number {
+function getRowPlaceholderCount(row: (typeof rowBlueprints)[number]): number {
   return 'placeholders' in row ? row.placeholders : 0;
 }
 
@@ -396,27 +394,35 @@ const fallbackOrganTypes = [
   'Colon',
 ] as const;
 
-const fallbackCaseTypes = ['#B# Biopsia', '#C# Citología', '#P# Pieza'] as const;
+const fallbackCaseTypes = [
+  '#B# Biopsia',
+  '#C# Citología',
+  '#P# Pieza',
+] as const;
 
 const blockLocations = ['Estantería A', 'Estantería B', 'Microtomía'] as const;
 const blockStatuses = ['Pendiente retiro', 'En corte', 'Listo'] as const;
-const medicalStatuses = ['Ingreso', 'En microscopía', 'Pendiente firma'] as const;
+const medicalStatuses = [
+  'Ingreso',
+  'En microscopía',
+  'Pendiente firma',
+] as const;
 
 export const baseModalFilterOptions: ModalFilterOptions = {
   pathologists: [
-    { value: '', label: 'Todos' },
+    { value: '__all__', label: 'Todos' },
     ...fallbackPathologists.map((value) => ({ value, label: value })),
   ],
   organTypes: [
-    { value: '', label: 'Todos' },
+    { value: '__all__', label: 'Todos' },
     ...fallbackOrganTypes.map((value) => ({ value, label: value })),
   ],
   caseTypes: [
-    { value: '', label: 'Todos' },
+    { value: '__all__', label: 'Todos' },
     ...fallbackCaseTypes.map((value) => ({ value, label: value })),
   ],
   macroPathologists: [
-    { value: '', label: 'Todos' },
+    { value: '__all__', label: 'Todos' },
     ...fallbackMacroPathologists.map((value) => ({ value, label: value })),
   ],
 };
@@ -481,9 +487,12 @@ function createCasesForWidget(widgetId: WidgetId): CaseTableRow[] {
       fallbackMacroPathologists[
         (widgetId + index) % fallbackMacroPathologists.length
       ];
-    const organType = fallbackOrganTypes[(widgetId + index) % fallbackOrganTypes.length];
+    const organType =
+      fallbackOrganTypes[(widgetId + index) % fallbackOrganTypes.length];
     const caseType = fallbackCaseTypes[index % fallbackCaseTypes.length];
-    const techniqueOptions = drilldownData[widgetId].map((item) => item.technique);
+    const techniqueOptions = drilldownData[widgetId].map(
+      (item) => item.technique,
+    );
     const technique = techniqueOptions[index % (techniqueOptions.length || 1)];
 
     return {

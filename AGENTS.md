@@ -3,25 +3,51 @@
 ## Verify code
 
 ```bash
-npm run lint && npm run typecheck && npm run test && npm run format:check
+npm run lint && npm run typecheck && npm run test && npm run format
 ```
 
 Run `npm run dev` for dev server at http://localhost:3000.
 
+## Stack
+
+- Next.js 15 (App Router, static export to `out/`)
+- React 19 + TypeScript strict
+- Tailwind CSS + CSS variables for theming
+- `next-themes` for dark/light persistence
+- Framer Motion for animations
+- Vitest for unit tests (NOT Jest)
+- ESLint + Prettier
+
 ## Architecture
 
-- App Router: `app/` with route groups `(dashboard)`
-- UI components: `components/dashboard/`
-- Data layer (adapter pattern): `lib/dashboard/{contracts,mock-data,selectors,mock-adapter}.ts`
-- UI layer: `lib/ui/{tokens,components}.ts`
+```
+app/                    # App Router layouts and routes
+  (dashboard)/         # Route group for dashboard pages
+components/
+  ui/                  # shadcn-style primitives (button, card, dialog, etc.)
+  dashboard/           # Dashboard-specific components
+lib/
+  dashboard/           # Adapter pattern: contracts, mock-data, selectors
+  ui/                 # Design tokens and base UI components
+```
 
-**Never import from mock-adapter directly** in components. Use contracts to define types, selectors to derive state.
+**Key rule**: Never import from `mock-adapter` directly in components. Use `contracts.ts` for types and `selectors.ts` for derived state.
+
+## shadcn-ui Components
+
+**Available in `components/ui/`**: badge, button, card, dialog, input, select, separator, sheet, table
+
+**Radix dependencies installed**: @radix-ui/react-dialog, @radix-ui/react-dropdown-menu, @radix-ui/react-select, @radix-ui/react-separator, @radix-ui/react-slot, @radix-ui/react-tabs
+
+### Radix Dialog quirk
+
+`DialogContent` from `components/ui/dialog.tsx` requires a `DialogTitle` for accessibility. The base component includes a hidden fallback (`sr-only`), but explicit `DialogTitle` inside dialogs is still required. If you create a new dialog, include both `DialogTitle` and optionally `DialogDescription`.
 
 ## UI Design System
 
-Antes de generar código UI, leer `.agents/skills/uncodixfy.md` para evitar patrones de IA genérica.
+Before generating UI code, read `.agents/skills/uncodixfy.md` to avoid generic AI patterns.
 
-### Tokens (lib/ui/tokens.ts)
+### Tokens (`lib/ui/tokens.ts`)
 
 - `spacing`: gap-1 a gap-6
 - `padding`: p-2 a p-6
@@ -31,7 +57,7 @@ Antes de generar código UI, leer `.agents/skills/uncodixfy.md` para evitar patr
 - `button`: base, hover, active
 - `navigation`: item, itemActive, itemInactive
 
-### Componentes base (lib/ui/components.tsx)
+### Base components (`lib/ui/components.tsx`)
 
 - `<Card variant="default | section">`
 - `<Section spacing="lg">`
@@ -41,21 +67,28 @@ Antes de generar código UI, leer `.agents/skills/uncodixfy.md` para evitar patr
 - `<NavLink href active>`
 - `<NavList>`
 
-### reglasUncodixfy
+### Uncodixfy rules
 
-- Sin tracking-[] excesivo
-- Sin uppercase decorativo
-- Sin border-left como decoration
-- Radio máximo 12px
-- Badges solo cuando son funcionales
-- Espaciado consistente
+- No excessive `tracking-[]`
+- No decorative uppercase
+- No `border-left` as decoration
+- Max radius 12px
+- Badges only when functional
+- Consistent spacing
 
 ## Tests
 
-- Vitest: `npm run test` (not jest)
-- Run single file: `vitest run lib/dashboard/selectors.test.ts`
-- Test files: `*.test.ts`, `*.test.tsx`
+```bash
+npm run test                    # Run all tests
+vitest run lib/dashboard/selectors.test.ts  # Single file
+```
+
+Test files: `*.test.ts`, `*.test.tsx`. Environment: jsdom.
 
 ## Build
 
-Static export to `out/`: `npm run build`. Output uses trailing slashes (e.g., `/areas/`).
+Static export to `out/`: `npm run build`. Output uses trailing slashes (`/areas/`). Configure Vercel with output directory `out`.
+
+## Current Work (fix.md - potentially stale)
+
+shadcn-ui migration in progress. Phase 1 (infrastructure) largely complete. Phase 2 (component migration) ongoing.

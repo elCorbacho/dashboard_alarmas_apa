@@ -218,7 +218,10 @@ function filterByModalFilters<T>(
       !filters.macroPathologist ||
       !resolver.macroPathologist ||
       resolver.macroPathologist(row) === filters.macroPathologist;
-    const searchMatch = includesSearch(resolver.searchText(row), filters.search);
+    const searchMatch = includesSearch(
+      resolver.searchText(row),
+      filters.search,
+    );
 
     return (
       pathologistMatch &&
@@ -381,9 +384,9 @@ export function getModalViewModel(
 
 export function getModalStats(
   rows: Array<
-    Pick<BlockTableRow, 'days' | 'pathologist'> |
-      Pick<MedicalTableRow, 'days' | 'pathologist'> |
-      Pick<CaseTableRow, 'days' | 'pathologist'>
+    | Pick<BlockTableRow, 'days' | 'pathologist'>
+    | Pick<MedicalTableRow, 'days' | 'pathologist'>
+    | Pick<CaseTableRow, 'days' | 'pathologist'>
   >,
 ): ModalStatSummary {
   return {
