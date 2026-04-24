@@ -1,6 +1,6 @@
 # Dashboard BI4H
 
-[![GPL License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![License: PolyForm Noncommercial](https://img.shields.io/badge/License-PolyForm%20Noncommercial%201.0.0-orange)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -80,7 +80,7 @@ vercel --prod
 
 ## License
 
-Este proyecto está bajo **GNU General Public License v3.0**.
+Este proyecto está bajo **PolyForm Noncommercial License 1.0.0**.
 
 Ver [LICENSE](LICENSE) para más detalles.
 
